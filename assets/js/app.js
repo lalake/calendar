@@ -55,7 +55,6 @@
       const todayButton = document.getElementById("todayButton");
       const nextMonthButton = document.getElementById("nextMonthButton");
       const weekRangeLabel = document.getElementById("weekRangeLabel");
-      const cycleLabel = document.getElementById("cycleLabel");
       const weekStrip = document.getElementById("weekStrip");
       const upcomingList = document.getElementById("upcomingList");
       const calendarGrid = document.getElementById("calendarGrid");
@@ -167,7 +166,7 @@
           const year = state.viewDate.getFullYear();
           const month = state.viewDate.getMonth() + 1;
           monthLabel.textContent = `${year}年${month}月`;
-          subTitle.textContent = `今天 ${formatSolarDate(today)} · ${todayShift} · 周期第${getCycleDay(today, state.config)}天`;
+          subTitle.textContent = `今天 ${formatSolarDate(today)} · ${todayShift}`;
           return;
         }
 
@@ -175,7 +174,7 @@
         const weekStart = getWeekStart(state.viewDate);
         const weekEnd = addDays(weekStart, 6);
         monthLabel.textContent = formatFocusLabel(state.viewDate);
-        subTitle.textContent = `${isSameDate(state.viewDate, today) ? "今天" : "聚焦"} ${focusShift} · 周期第${getCycleDay(state.viewDate, state.config)}天 · ${formatMonthDay(weekStart)} - ${formatMonthDay(weekEnd)}`;
+        subTitle.textContent = `${isSameDate(state.viewDate, today) ? "今天" : "聚焦"} ${focusShift} · ${formatMonthDay(weekStart)} - ${formatMonthDay(weekEnd)}`;
       }
 
       function renderNavigation() {
@@ -222,9 +221,9 @@
 
           cells.push(`
             <article class="${classNames}" title="${buildTitle(current, lunar, shift)}">
+              ${isToday ? '<span class="day-today-marker" aria-hidden="true">今</span>' : ""}
               <div class="day-top">
                 <div class="day-number">${current.getDate()}</div>
-                ${isToday ? '<span class="today-tag">今天</span>' : ""}
               </div>
               <div class="lunar-text">${lunarText}</div>
               <div class="shift-badge shift-${shift}">${shift}</div>
@@ -239,7 +238,6 @@
         const weekStart = getWeekStart(state.viewDate);
         const weekEnd = addDays(weekStart, 6);
         weekRangeLabel.textContent = `${formatMonthDay(weekStart)} - ${formatMonthDay(weekEnd)}`;
-        cycleLabel.textContent = `周期第 ${getCycleDay(state.viewDate, state.config)} 天`;
 
         const weekCells = [];
         for (let offset = 0; offset < 7; offset += 1) {
@@ -247,23 +245,25 @@
           const lunar = solarToLunar(current);
           const shift = getShiftForDate(current, state.config);
           const lunarText = lunar ? formatLunarLabel(lunar) : "";
+          const isTodayCard = isSameDate(current, today);
           const classNames = [
             "week-card",
-            isSameDate(current, today) ? "today" : "",
+            isTodayCard ? "today" : "",
             isSameDate(current, state.viewDate) ? "selected" : ""
           ].filter(Boolean).join(" ");
+          const currentDayAttribute = isTodayCard ? ' aria-current="date"' : "";
 
           weekCells.push(`
-            <button class="${classNames}" type="button" data-date="${formatDateValue(current)}" title="${buildTitle(current, lunar, shift)}">
+            <button class="${classNames}" type="button" data-date="${formatDateValue(current)}" title="${buildTitle(current, lunar, shift)}"${currentDayAttribute}>
+              ${isTodayCard ? '<span class="week-today-marker" aria-hidden="true">今</span>' : ""}
               <div class="week-card-top">
                 <div class="week-card-weekday">${WEEKDAY_NAMES[current.getDay()]}</div>
-                <div class="upcoming-line">
+                <div class="week-card-date-row">
                   <div class="week-card-date">${current.getDate()}</div>
-                  ${isSameDate(current, today) ? '<span class="today-tag">今天</span>' : ""}
                 </div>
               </div>
               <div class="week-card-lunar">${lunarText}</div>
-              <div class="shift-badge shift-${shift}">${shift}</div>
+              <div class="week-shift-badge shift-${shift}">${shift}</div>
             </button>
           `);
         }
@@ -297,7 +297,6 @@
               </div>
               <div class="upcoming-side">
                 <span class="shift-badge shift-${shift}">${shift}</span>
-                <span class="cycle-chip">第${getCycleDay(current, state.config)}天</span>
               </div>
             </button>
           `);
@@ -421,13 +420,6 @@
         const normalized = ((diff % cycleLength) + cycleLength) % cycleLength;
         const shiftIndex = Math.floor(normalized / 2);
         return config.sequence[shiftIndex];
-      }
-
-      function getCycleDay(date, config) {
-        const start = parseDate(config.startDate);
-        const diff = diffDays(date, start);
-        const cycleLength = config.sequence.length * 2;
-        return ((diff % cycleLength) + cycleLength) % cycleLength + 1;
       }
 
       function buildTitle(date, lunar, shift) {

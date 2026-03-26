@@ -1,11 +1,13 @@
 ﻿<!DOCTYPE html>
 <html lang="zh-CN">
+
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
   <title>轮班日历</title>
   <link rel="stylesheet" href="./assets/css/styles.css" />
 </head>
+
 <body>
   <main class="app">
     <section class="surface hero">
@@ -31,7 +33,6 @@
           <p class="section-label">本周视图</p>
           <h2 class="mobile-section-title" id="weekRangeLabel"></h2>
         </div>
-        <div class="cycle-pill" id="cycleLabel"></div>
       </div>
       <div class="week-strip" id="weekStrip"></div>
     </section>
@@ -42,7 +43,7 @@
           <p class="section-label">未来两周</p>
           <h2 class="mobile-section-title">近期安排</h2>
         </div>
-        <p class="mobile-section-copy">点击日期可切换聚焦日，手机端默认展示周视图和未来安排。</p>
+        <p class="mobile-section-copy">Tips：点击聚焦日期</p>
       </div>
       <div class="upcoming-list" id="upcomingList"></div>
     </section>
@@ -67,7 +68,7 @@
         <span class="shift-badge shift-晚班">晚班</span>
         <span class="shift-badge shift-休息">休息</span>
       </div>
-      <div class="legend-note">移动端展示本周与未来 14 天，桌面端保留 7 列月视图。</div>
+
     </section>
   </main>
 
@@ -112,5 +113,5 @@
   <div class="toast" id="toast"></div>
   <script src="./assets/js/app.js"></script>
 </body>
-</html>
 
+</html>
